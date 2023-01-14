@@ -35,19 +35,19 @@ basket_France = pd.get_dummies(basket_France).astype(bool)
 basket_UK = pd.get_dummies(basket_UK).astype(bool)
 basket_Por = pd.get_dummies(basket_Por).astype(bool)
 basket_Sweden = pd.get_dummies(basket_Sweden).astype(bool)
-
-frq_items_France = apriori(basket_France, min_support = 0.01, use_colnames = True)
+#%%
+frq_items_France = apriori(basket_France, min_support = 0.05, use_colnames = True)
 rules_France = association_rules(frq_items_France, metric ="lift", min_threshold = 1)
 rules_France = rules_France.sort_values(['confidence', 'lift'], ascending =[False, False])
 
-frq_items_UK = apriori(basket_UK, min_support = 0.02, use_colnames = True)
+frq_items_UK = apriori(basket_UK, min_support = 0.05, use_colnames = True)
 rules_UK = association_rules(frq_items_UK, metric ="lift", min_threshold = 1)
 rules_UK = rules_UK.sort_values(['confidence', 'lift'], ascending =[False, False])
-
-frq_items_Por = apriori(basket_Por, min_support = 0.05, use_colnames = True)
+#%%
+frq_items_Por = apriori(basket_Por, min_support = 0.03, use_colnames = True)
 rules_Por = association_rules(frq_items_Por, metric ="lift", min_threshold = 1)
 rules_Por = rules_Por.sort_values(['confidence', 'lift'], ascending =[False, False])
-
+#%%
 frq_items_Sweden = apriori(basket_Sweden, min_support = 0.05, use_colnames = True)
 rules_Sweden = association_rules(frq_items_Sweden, metric ="lift", min_threshold = 1)
 rules_Sweden = rules_Sweden.sort_values(['confidence', 'lift'], ascending =[False, False])
