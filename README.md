@@ -10,7 +10,7 @@
 * Product Suggestion and DL Model Integration
 * Testing
 * UI (?)
-[ ] A
-[x] B
-[ ] C
+- [ ] A
+- [x] B
+- [ ] C
 ***
