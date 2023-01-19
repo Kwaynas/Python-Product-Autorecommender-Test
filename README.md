@@ -1,5 +1,4 @@
 ***
-# Service_Learning_Project
 # Project Requirement for CPE126
 ***
 ### Tasks Completed:
