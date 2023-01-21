@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from mlxtend.frequent_patterns import apriori, association_rules, fpgrowth
-import os
+# import os
 data = pd.read_csv('Raw Database.csv')
 data['Description'] = data['Description'].str.strip()
 
@@ -44,7 +44,7 @@ frq_items_UK = apriori(basket_UK, min_support = 0.05, use_colnames = True)
 rules_UK = association_rules(frq_items_UK, metric ="lift", min_threshold = 1)
 rules_UK = rules_UK.sort_values(['confidence', 'lift'], ascending =[False, False])
 #%%
-frq_items_Por = apriori(basket_Por, min_support = 0.03, use_colnames = True)
+frq_items_Por = apriori(basket_Por, min_support = 0.05, use_colnames = True)
 rules_Por = association_rules(frq_items_Por, metric ="lift", min_threshold = 1)
 rules_Por = rules_Por.sort_values(['confidence', 'lift'], ascending =[False, False])
 #%%
@@ -63,7 +63,11 @@ def predict(antecedent, rules, max_results=6):
     return preds.iloc[:max_results].unique()
 
 
-preds = predict({'SET OF 4 KNICK KNACK TINS LONDON'}, rules=rules_Por)
-print(preds)
+print(predict({'SET OF 4 KNICK KNACK TINS LONDON'}, rules=rules_Por))
 
+print(predict({'JAM MAKING SET PRINTED'}, rules=rules_Por))
+
+print(predict({'ASS FLORAL PRINT MULTI SCREWDRIVER'}, rules=rules_Por))
+
+print(predict({'PLASTERS IN TIN STRONGMAN'}, rules=rules_Por))
 # basket_France.to_excel(os.getcwd()+'/df.xlsx')
