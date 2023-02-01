@@ -24,26 +24,19 @@ from mlxtend.frequent_patterns import apriori, association_rules, fpgrowth
 from thefuzz import fuzz
 from thefuzz import process
 import math
-
-# import os
+import json
+import requests
+import os
 
 
 data = pd.read_csv('Raw Database.csv')
 data['Description'] = data['Description'].str.strip()
 data = data[~data['InvoiceNo'].str.contains('C')]
+print(data.head())
+# data = data[~data['Description'] == "POSTAGE"] 
 
 items = data['Description'][data['Country'] =="Portugal"].unique()
 
-basket_Por = (data[data['Country'] =="Portugal"]
-        .groupby(['InvoiceNo', 'Description'])['Quantity']
-        .sum().unstack().reset_index().fillna(0)
-        .set_index('InvoiceNo'))
-
-basket_Por = pd.get_dummies(basket_Por).astype(bool)
-
-frq_items_Por = apriori(basket_Por, min_support = 0.04, use_colnames = True)
-rules_Por = association_rules(frq_items_Por, metric ="lift", min_threshold = 1)
-rules_Por = rules_Por.sort_values(['confidence', 'lift'], ascending =[False, False])
 
 
 class Ui_MainWindow(object):
@@ -101,7 +94,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.ItemLst = QListWidget(self.horizontalLayoutWidget_3)
         self.ItemLst.setObjectName(u"ItemLst")
-        self.ItemLst.clicked.connect(self.item_clicked)
+        self.ItemLst.clicked.connect(self.item_clicked2)
 
         self.horizontalLayout_3.addWidget(self.ItemLst)
 
@@ -140,33 +133,33 @@ class Ui_MainWindow(object):
 
 
     #CustomFunctions
-    def predict(self, antecedent, rules=rules_Por, max_results=10):
-        # get the rules for this antecedent
-        temp = set()
-        temp.add(antecedent)
-        preds = rules[rules['antecedents'] == temp]
-        try:
-            self.value = preds['confidence'].iloc[:max_results].unique().mean()
-        finally:
-            pass
-        # a way to convert a frozen set with one element to string
-        preds = preds['consequents'].apply(iter).apply(next)
-        return preds.iloc[:max_results].unique()
+    def predict_reco(self, description, maxres=10):
+        url = 'http://127.0.0.1:5000/productreco'
+        data = {"Description": description, "MaxRes": 10}
+        data_json = json.dumps(data)
+        headers = {'Content-type':'application/json'}
+        response = requests.post(url, data=data_json, headers=headers, timeout=500)
+        result = json.loads(response.text)
+        return result 
 
-    def item_clicked(self):
+    def item_clicked2(self):
         select = self.ItemLst.currentItem().text()
         self.PredictLst.clear()
-        recommendations = self.predict(select)
-        for index, recommendation in enumerate(recommendations):
+        
+        recommendations = self.predict_reco(select)
+        for index, recommendation in enumerate(recommendations['a']):
             self.PredictLst.insertItem(index, recommendation)
+        
+        
         self.PredictLst.insertItem(self.PredictLst.count() + 1, '')
+        self.value = recommendations['b']
         if self.value == 1.0:
-            self.PredictLst.insertItem(self.PredictLst.count() + 1, f'Confidence Level: 0.25')
+            self.PredictLst.insertItem(self.PredictLst.count() + 1, 'Confidence Level: 0.25')
         elif math.isnan(self.value)==True:
-            self.PredictLst.insertItem(self.PredictLst.count() + 1, f'Confidence Level: N/A')
+            self.PredictLst.insertItem(self.PredictLst.count() + 1, 'Confidence Level: N/A')
         else:
-            self.PredictLst.insertItem(self.PredictLst.count() + 1, f'Confidence Level: {self.value}')
-
+            self.PredictLst.insertItem(self.PredictLst.count() + 1, f'Confidence Level: {self.value:.2f}')
+    
     def searchtxt_changed(self):
         if not self.ItemTxbx.text():
             for index, item in enumerate(items):
@@ -177,10 +170,14 @@ class Ui_MainWindow(object):
             self.ItemLst.clear()
             for index, result in enumerate(results):
                 self.ItemLst.insertItem(index, result[0])
+                
     def reset_clicked(self):
         for index, item in enumerate(items):
             self.ItemLst.insertItem(index, item)
         self.ItemTxbx.setText('')
         self.PredictLst.clear()
+        
+     
+    
 
 
