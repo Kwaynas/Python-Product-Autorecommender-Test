@@ -32,7 +32,6 @@ import os
 data = pd.read_csv('Raw Database.csv')
 data['Description'] = data['Description'].str.strip()
 data = data[~data['InvoiceNo'].str.contains('C')]
-print(data.head())
 # data = data[~data['Description'] == "POSTAGE"] 
 
 items = data['Description'][data['Country'] =="Portugal"].unique()
