@@ -29,7 +29,7 @@ import requests
 import os
 
 
-data = pd.read_csv('Raw Database.csv')
+data = pd.read_parquet('df.parquet')
 data['Description'] = data['Description'].str.strip()
 data = data[~data['InvoiceNo'].str.contains('C')]
 # data = data[~data['Description'] == "POSTAGE"] 
